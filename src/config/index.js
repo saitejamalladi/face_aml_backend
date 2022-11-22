@@ -3,6 +3,11 @@ module.exports = {
   jwt: {
     secret: process.env.JWT_SIGNING_KEY,
   },
+  aws: {
+    access_key: process.env.AWS_ACCESS_KEY,
+    access_secret: process.env.AWS_ACCESS_SECRET,
+    region: process.env.AWS_REGION,
+  },
   sql: {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
