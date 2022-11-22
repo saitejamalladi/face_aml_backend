@@ -1,0 +1,30 @@
+{
+  "name": "digital_shelf_data_content",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1259.0",
+    "bcrypt": "^5.0.0",
+    "cookie-parser": "~1.4.4",
+    "crypto": "^1.0.1",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "express-validator": "^6.6.1",
+    "hbs": "^4.1.1",
+    "http-errors": "~1.6.3",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
+    "moment": "^2.27.0",
+    "morgan": "~1.9.1",
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.3.5",
+    "sequelize-auto": "^0.5.4",
+    "swagger-ui-express": "^4.1.4",
+    "typedi": "^0.8.0",
+    "yamljs": "^0.3.0"
+  }
+}
