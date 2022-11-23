@@ -9,5 +9,4 @@ module.exports = {
   ROLES: roles,
   PRODUCT_INDEX: "products",
   FACE_AML_SOURCE_BUCKET: "face-aml-source-bucket",
-  FACE_AML_TARGET_BUCKET: "face-aml-target-bucket",
 };

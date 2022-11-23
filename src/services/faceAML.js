@@ -2,29 +2,32 @@ const response = require("../utils/response");
 const AWS = require("aws-sdk");
 const config = require("../config");
 const randomKeyService = require("./randomKey");
-const {
-  FACE_AML_SOURCE_BUCKET,
-  FACE_AML_TARGET_BUCKET,
-} = require("../constants");
+const FaceMapping = require("../models/mapping").FaceMapping;
+const { FACE_AML_SOURCE_BUCKET } = require("../constants");
 
 class FaceAMLService {
   async compareFaces(requestBody, files) {
     const similarityThreshold = requestBody.similarity_threshold; //70 default
-    let targetImages = ["narendra_modi.jpg", "nirav_modi.jpg"];
+    let faceMappings = await FaceMapping.findAll({
+      attributes: ["name", "s3_bucket", "s3_file_name"],
+      raw: true,
+    });
     let sourceImageS3Data = await this.uploadImage(files.image);
     try {
       let results = await Promise.all(
-        targetImages.map((targetImage) =>
+        faceMappings.map((faceMapping) =>
           this.getAWSResponse(
+            FACE_AML_SOURCE_BUCKET,
             sourceImageS3Data.key,
-            targetImage,
+            faceMapping.s3_bucket,
+            faceMapping.s3_file_name,
             similarityThreshold
           )
         )
       );
       let faceAMLResponse = results.map((result, index) => {
         return {
-          imageName: targetImages[index],
+          imageName: faceMappings[index].name,
           similarity:
             result.FaceMatches.length > 0
               ? Math.max(...result.FaceMatches.map((face) => face.Similarity))
@@ -40,7 +43,13 @@ class FaceAMLService {
     }
   }
 
-  async getAWSResponse(sourceImage, targetImage, similarityThreshold) {
+  async getAWSResponse(
+    sourceBucket,
+    sourceImage,
+    targetBucket,
+    targetImage,
+    similarityThreshold
+  ) {
     const awsConfig = new AWS.Config({
       accessKeyId: config.aws.access_key,
       secretAccessKey: config.aws.access_secret,
@@ -50,13 +59,13 @@ class FaceAMLService {
     const params = {
       SourceImage: {
         S3Object: {
-          Bucket: FACE_AML_SOURCE_BUCKET,
+          Bucket: sourceBucket,
           Name: sourceImage,
         },
       },
       TargetImage: {
         S3Object: {
-          Bucket: FACE_AML_TARGET_BUCKET,
+          Bucket: targetBucket,
           Name: targetImage,
         },
       },
