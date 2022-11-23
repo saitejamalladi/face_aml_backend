@@ -13,34 +13,35 @@ class FaceAMLService {
       raw: true,
     });
     let sourceImageS3Data = await this.uploadImage(files.image);
-    try {
-      let results = await Promise.all(
-        faceMappings.map((faceMapping) =>
-          this.getAWSResponse(
-            FACE_AML_SOURCE_BUCKET,
-            sourceImageS3Data.key,
-            faceMapping.s3_bucket,
-            faceMapping.s3_file_name,
-            similarityThreshold
-          )
-        )
-      );
-      let faceAMLResponse = results.map((result, index) => {
-        return {
-          imageName: faceMappings[index].name,
-          similarity:
-            result.FaceMatches.length > 0
-              ? Math.max(...result.FaceMatches.map((face) => face.Similarity))
-              : 0,
-        };
-      });
-      return response.handleSuccessResponseWithData(
-        "Face AML Response",
-        faceAMLResponse
-      );
-    } catch (error) {
-      return response.handleInternalServerError(error);
-    }
+    return sourceImageS3Data;
+    // try {
+    //   let results = await Promise.all(
+    //     faceMappings.map((faceMapping) =>
+    //       this.getAWSResponse(
+    //         FACE_AML_SOURCE_BUCKET,
+    //         sourceImageS3Data.key,
+    //         faceMapping.s3_bucket,
+    //         faceMapping.s3_file_name,
+    //         similarityThreshold
+    //       )
+    //     )
+    //   );
+    //   let faceAMLResponse = results.map((result, index) => {
+    //     return {
+    //       imageName: faceMappings[index].name,
+    //       similarity:
+    //         result.FaceMatches.length > 0
+    //           ? Math.max(...result.FaceMatches.map((face) => face.Similarity))
+    //           : 0,
+    //     };
+    //   });
+    //   return response.handleSuccessResponseWithData(
+    //     "Face AML Response",
+    //     faceAMLResponse
+    //   );
+    // } catch (error) {
+    //   return response.handleInternalServerError(error);
+    // }
   }
 
   async getAWSResponse(
