@@ -37,22 +37,13 @@ app.options("*", (req, res) => {
   res.status(200).send("Allow CORS");
 });
 app.use("/api", indexRouter);
-app.post(
-  "/image",
-  bodyParser.raw({ type: ["image/jpeg"], limit: "5mb" }),
-  (req, res) => {
-    console.log(req.body);
-    fs.readFileSync(imagePath);
-    res.sendStatus(200);
-  }
-);
 app.get("/", (req, res) => {
   res
     .status(200)
     .send("Face AML Backend service. Go to /api-docs to get the documentation");
 });
 app.get("/health", (req, res) => {
-  res.status(200).send("Health Check Successful");
+  res.status(200).send("Health Check Ok...");
 });
 app.use(
   "/api-docs",
