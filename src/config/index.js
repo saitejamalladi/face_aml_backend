@@ -7,6 +7,7 @@ module.exports = {
     access_key: process.env.AWS_ACCESS_KEY,
     access_secret: process.env.AWS_ACCESS_SECRET,
     region: process.env.AWS_REGION,
+    source_bucket: process.env.AWS_SOURCE_BUCKET,
   },
   sql: {
     database: process.env.DB_NAME,

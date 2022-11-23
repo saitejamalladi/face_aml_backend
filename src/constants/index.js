@@ -8,5 +8,4 @@ module.exports = {
   VALIDATIONS: validations,
   ROLES: roles,
   PRODUCT_INDEX: "products",
-  FACE_AML_SOURCE_BUCKET: "face-aml-source-bucket",
 };

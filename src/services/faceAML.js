@@ -3,7 +3,6 @@ const AWS = require("aws-sdk");
 const config = require("../config");
 const randomKeyService = require("./randomKey");
 const FaceMapping = require("../models/mapping").FaceMapping;
-const { FACE_AML_SOURCE_BUCKET } = require("../constants");
 
 class FaceAMLService {
   async compareFaces(requestBody, files) {
@@ -13,35 +12,34 @@ class FaceAMLService {
       raw: true,
     });
     let sourceImageS3Data = await this.uploadImage(files.image);
-    return sourceImageS3Data;
-    // try {
-    //   let results = await Promise.all(
-    //     faceMappings.map((faceMapping) =>
-    //       this.getAWSResponse(
-    //         FACE_AML_SOURCE_BUCKET,
-    //         sourceImageS3Data.key,
-    //         faceMapping.s3_bucket,
-    //         faceMapping.s3_file_name,
-    //         similarityThreshold
-    //       )
-    //     )
-    //   );
-    //   let faceAMLResponse = results.map((result, index) => {
-    //     return {
-    //       imageName: faceMappings[index].name,
-    //       similarity:
-    //         result.FaceMatches.length > 0
-    //           ? Math.max(...result.FaceMatches.map((face) => face.Similarity))
-    //           : 0,
-    //     };
-    //   });
-    //   return response.handleSuccessResponseWithData(
-    //     "Face AML Response",
-    //     faceAMLResponse
-    //   );
-    // } catch (error) {
-    //   return response.handleInternalServerError(error);
-    // }
+    try {
+      let results = await Promise.all(
+        faceMappings.map((faceMapping) =>
+          this.getAWSResponse(
+            config.aws.source_bucket,
+            sourceImageS3Data.key,
+            faceMapping.s3_bucket,
+            faceMapping.s3_file_name,
+            similarityThreshold
+          )
+        )
+      );
+      let faceAMLResponse = results.map((result, index) => {
+        return {
+          imageName: faceMappings[index].name,
+          similarity:
+            result.FaceMatches.length > 0
+              ? Math.max(...result.FaceMatches.map((face) => face.Similarity))
+              : 0,
+        };
+      });
+      return response.handleSuccessResponseWithData(
+        "Face AML Response",
+        faceAMLResponse
+      );
+    } catch (error) {
+      return response.handleInternalServerError(error);
+    }
   }
 
   async getAWSResponse(
@@ -100,7 +98,7 @@ class FaceAMLService {
     try {
       const uploadedImageResponse = await s3Client
         .upload({
-          Bucket: FACE_AML_SOURCE_BUCKET,
+          Bucket: config.aws.source_bucket,
           Key: sourceImageName,
           Body: blob,
         })
