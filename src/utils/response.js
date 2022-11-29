@@ -1,3 +1,5 @@
+const randomKeyService = require("../services/randomKey");
+
 class Response {
   handleBadRequest(errorMessage) {
     return {
@@ -42,9 +44,9 @@ class Response {
       display_msg: successMessage,
     };
   }
-  handleSuccessResponseWithData(successMessage, responseData, transactionId) {
+  async handleSuccessResponseWithData(successMessage, responseData) {
     return {
-      transaction_id: transactionId,
+      transaction_id: await randomKeyService.generate(6),
       is_error: false,
       status_code: 200,
       display_msg: successMessage,
@@ -65,8 +67,9 @@ class Response {
       display_msg: errorArray[0]["msg"] + " in " + errorArray[0]["location"],
     };
   }
-  handleInternalServerError(errorMessage) {
+  async handleInternalServerError(errorMessage) {
     return {
+      transaction_id: await randomKeyService.generate(6),
       is_error: true,
       status_code: 500,
       display_msg: errorMessage,

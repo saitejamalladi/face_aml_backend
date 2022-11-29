@@ -6,7 +6,6 @@ const FaceMapping = require("../models/mapping").FaceMapping;
 
 class FaceAMLService {
   async compareFaces(requestBody, files) {
-    let transactionId = await randomKeyService.generate(6);
     const similarityThreshold = requestBody.similarity_threshold; //70 default
     let faceMappings = await FaceMapping.findAll({
       attributes: [
@@ -45,13 +44,12 @@ class FaceAMLService {
           };
         })
         ?.filter((face) => face.similarity > 0);
-      return response.handleSuccessResponseWithData(
+      return await response.handleSuccessResponseWithData(
         "Face AML Response",
-        faceAMLResponse,
-        transactionId
+        faceAMLResponse
       );
     } catch (error) {
-      return response.handleInternalServerError(error);
+      return await response.handleInternalServerError(error);
     }
   }
 
