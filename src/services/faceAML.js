@@ -36,6 +36,7 @@ class FaceAMLService {
         .map((result, index) => {
           return {
             ...faceMappings[index],
+            bucket: config.aws.target_bucket,
             similarity: Math.max(
               ...result.FaceMatches.map((face) => face.Similarity)
             ),
