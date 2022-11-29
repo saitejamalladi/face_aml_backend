@@ -9,38 +9,46 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: false,
         primaryKey: true,
       },
+      profile_id: {
+        field: "name",
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       name: {
         field: "name",
         type: DataTypes.STRING,
         allowNull: false,
       },
-      s3_bucket: {
-        field: "s3_bucket",
+      dob: {
+        field: "dob",
         type: DataTypes.STRING,
         allowNull: false,
       },
-      s3_file_name: {
-        field: "s3_file_name",
+      remarks: {
+        field: "remarks",
         type: DataTypes.STRING,
         allowNull: false,
       },
-      created_at: {
-        field: "created_at",
-        type: DataTypes.DATE,
+      face_image: {
+        field: "face_image",
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
       },
-      updated_at: {
-        field: "updated_at",
-        type: DataTypes.DATE,
+      web_link: {
+        field: "web_link",
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      weblink_pdf: {
+        field: "weblink_pdf",
+        type: DataTypes.STRING,
+        allowNull: false,
       },
     },
     {
       sequelize,
       schema: "face_aml",
-      tableName: "face_mappings",
+      tableName: "face_data_clone",
       timestamps: false,
     }
   );

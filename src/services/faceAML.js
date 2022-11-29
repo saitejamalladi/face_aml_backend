@@ -8,7 +8,15 @@ class FaceAMLService {
   async compareFaces(requestBody, files) {
     const similarityThreshold = requestBody.similarity_threshold; //70 default
     let faceMappings = await FaceMapping.findAll({
-      attributes: ["name", "s3_bucket", "s3_file_name"],
+      attributes: [
+        "profile_id",
+        "name",
+        "dob",
+        "remarks",
+        "face_image",
+        "web_link",
+        "weblink_pdf",
+      ],
       raw: true,
     });
     let sourceImageS3Data = await this.uploadImage(files.image);
@@ -18,21 +26,23 @@ class FaceAMLService {
           this.getAWSResponse(
             config.aws.source_bucket,
             sourceImageS3Data.key,
-            faceMapping.s3_bucket,
-            faceMapping.s3_file_name,
+            config.aws.target_bucket,
+            faceMapping.face_image,
             similarityThreshold
           )
         )
       );
-      let faceAMLResponse = results.map((result, index) => {
-        return {
-          imageName: faceMappings[index].name,
-          similarity:
-            result.FaceMatches.length > 0
-              ? Math.max(...result.FaceMatches.map((face) => face.Similarity))
-              : 0,
-        };
-      });
+      let faceAMLResponse = results
+        .map((result, index) => {
+          return {
+            ...faceMappings[index],
+            similarity: Math.max(
+              ...result.FaceMatches.map((face) => face.Similarity)
+            ),
+            metadata: result,
+          };
+        })
+        ?.filter((face) => face.similarity > 0);
       return response.handleSuccessResponseWithData(
         "Face AML Response",
         faceAMLResponse
