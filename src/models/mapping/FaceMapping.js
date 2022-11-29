@@ -48,7 +48,7 @@ module.exports = function (sequelize, DataTypes) {
     {
       sequelize,
       schema: "face_aml",
-      tableName: "face_data_clone",
+      tableName: "face_data",
       timestamps: false,
     }
   );

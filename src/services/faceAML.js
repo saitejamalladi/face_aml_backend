@@ -8,6 +8,9 @@ class FaceAMLService {
   async compareFaces(requestBody, files) {
     const similarityThreshold = requestBody.similarity_threshold; //70 default
     let faceMappings = await FaceMapping.findAll({
+      where: {
+        name: requestBody.name,
+      },
       attributes: [
         "profile_id",
         "name",
