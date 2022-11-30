@@ -7,6 +7,7 @@ const FaceMapping = require("../models/mapping").FaceMapping;
 class FaceAMLService {
   async compareFaces(requestBody, files) {
     const similarityThreshold = requestBody.similarity_threshold; //70 default
+    let faceAMLResponse = [];
     let faceMappings = await FaceMapping.findAll({
       where: {
         name: requestBody.name,
@@ -22,39 +23,43 @@ class FaceAMLService {
       ],
       raw: true,
     });
-    let sourceImageS3Data = await this.uploadImage(files.image);
-    try {
-      let results = await Promise.all(
-        faceMappings.map((faceMapping) =>
-          this.getAWSResponse(
-            config.aws.source_bucket,
-            sourceImageS3Data.key,
-            config.aws.target_bucket,
-            faceMapping.face_image,
-            similarityThreshold
+    if (faceMappings.length > 0) {
+      let sourceImageS3Data = await this.uploadImage(files.image);
+      try {
+        let results = await Promise.all(
+          faceMappings.map((faceMapping) =>
+            this.getAWSResponse(
+              config.aws.source_bucket,
+              sourceImageS3Data.key,
+              config.aws.target_bucket,
+              faceMapping.face_image,
+              similarityThreshold
+            )
           )
-        )
-      );
-      let faceAMLResponse = results.map((result, index) => {
-        return {
-          ...faceMappings[index],
-          bucket: config.aws.target_bucket,
-          similarity:
-            Math.max(...result.FaceMatches.map((face) => face.Similarity)) || 0,
-          metadata: result,
-        };
-      });
-      let apiResponse = {
-        matchedFaces: faceAMLResponse?.filter((face) => face.similarity >= 75),
-        unMatchedFaces: faceAMLResponse?.filter((face) => face.similarity < 75),
-      };
-      return await response.handleSuccessResponseWithData(
-        "Face AML Response",
-        apiResponse
-      );
-    } catch (error) {
-      return await response.handleInternalServerError(error);
+        );
+        faceAMLResponse = results.map((result, index) => {
+          return {
+            ...faceMappings[index],
+            bucket: config.aws.target_bucket,
+            similarity:
+              Math.max(...result.FaceMatches.map((face) => face.Similarity)) ||
+              0,
+            metadata: result,
+          };
+        });
+      } catch (error) {
+        return await response.handleInternalServerError(error);
+      }
     }
+    let apiResponse = {
+      faceCount: faceMappings.length,
+      matchedFaces: faceAMLResponse?.filter((face) => face.similarity >= 75),
+      unMatchedFaces: faceAMLResponse?.filter((face) => face.similarity < 75),
+    };
+    return await response.handleSuccessResponseWithData(
+      "Face AML Response",
+      apiResponse
+    );
   }
 
   async getAWSResponse(
