@@ -35,21 +35,22 @@ class FaceAMLService {
           )
         )
       );
-      let faceAMLResponse = results
-        .map((result, index) => {
-          return {
-            ...faceMappings[index],
-            bucket: config.aws.target_bucket,
-            similarity: Math.max(
-              ...result.FaceMatches.map((face) => face.Similarity)
-            ),
-            metadata: result,
-          };
-        })
-        ?.filter((face) => face.similarity > 0);
+      let faceAMLResponse = results.map((result, index) => {
+        return {
+          ...faceMappings[index],
+          bucket: config.aws.target_bucket,
+          similarity:
+            Math.max(...result.FaceMatches.map((face) => face.Similarity)) || 0,
+          metadata: result,
+        };
+      });
+      let apiResponse = {
+        matchedFaces: faceAMLResponse?.filter((face) => face.similarity >= 75),
+        unMatchedFaces: faceAMLResponse?.filter((face) => face.similarity < 75),
+      };
       return await response.handleSuccessResponseWithData(
         "Face AML Response",
-        faceAMLResponse
+        apiResponse
       );
     } catch (error) {
       return await response.handleInternalServerError(error);
@@ -82,7 +83,7 @@ class FaceAMLService {
           Name: targetImage,
         },
       },
-      SimilarityThreshold: similarityThreshold || 70,
+      SimilarityThreshold: similarityThreshold || 0,
     };
 
     return new Promise((resolve, reject) => {
