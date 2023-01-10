@@ -9,6 +9,11 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: false,
         primaryKey: true,
       },
+      open_sanction_id: {
+        field: "open_sanction_id",
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       profile_id: {
         field: "name",
         type: DataTypes.INTEGER,
@@ -48,7 +53,7 @@ module.exports = function (sequelize, DataTypes) {
     {
       sequelize,
       schema: "face_aml",
-      tableName: "face_data",
+      tableName: "face_data_os",
       timestamps: false,
     }
   );
