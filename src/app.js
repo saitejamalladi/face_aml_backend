@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
     .send("Face AML Backend service. Go to /api-docs to get the documentation");
 });
 app.get("/health", (req, res) => {
-  res.status(200).send("Health Check Ok...");
+  res.status(200).send("Staging Health Check Ok...");
 });
 app.use(
   "/api-docs",
