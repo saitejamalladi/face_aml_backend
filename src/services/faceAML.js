@@ -40,7 +40,7 @@ class FaceAMLService {
     });
     reguloResponse = rosetteResponse.map((item, index) => {
       return {
-        hit_id: 1,
+        hit_id: 1 + index,
         name_matched: item.rosetteResponse[0]?.resultFields?.name,
         name_confidence: item.rosetteResponse[0]?.score.toFixed(3),
         face_found:
